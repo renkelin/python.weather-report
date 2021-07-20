@@ -1,0 +1,15 @@
+import requests
+from bs4 import BeautifulSoup
+
+def get_weather():
+    headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36'
+}
+    url = 'http://www.weather.com.cn/weather/101191001.shtml'
+
+    res = requests.get(url=url, headers=headers, verify=False)
+    res.encoding = 'utf-8'
+    bsdata = BeautifulSoup(res.text, 'html.parser')
+    data_temperature = bsdata.find('p', class_='tem').text
+    data_weather = bsdata.find('p', class_='wea').text
+    return data_temperature, data_weather

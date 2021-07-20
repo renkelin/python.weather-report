@@ -1,0 +1,17 @@
+import schedule
+import time
+
+def job():
+    print("开始第一次发送任务")
+    # tem, wea = get_weather()
+    # IsSuccess = send_email(tem, wea, sender, receiver, password)
+    # while IsSuccess is False:
+    #     print("邮件发送失败, 正在尝试重新发送")
+    #     IsSuccess = send_email(tem, wea, sender, receiver, password)
+    # print("任务完成")
+
+schedule.every().day.at("15:04").do(job)
+
+while True:
+    schedule.run_pending()
+    time.sleep(1)

@@ -1,0 +1,56 @@
+import requests
+from bs4 import BeautifulSoup
+import smtplib
+from email.mime.text import MIMEText
+from email.header import Header
+import schedule
+import time
+
+sender = input("请输入发件人账号: ")
+password = input("请输入发件人密码: ")
+recevier = input("请输入收件人邮箱: ")
+
+# 获取天气
+def get_weather():
+    headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36'
+}
+    url = 'http://www.weather.com.cn/weather/101191001.shtml'
+
+    res = requests.get(url=url, headers=headers, verify=False)
+    res.encoding = 'utf-8'
+    bsdata = BeautifulSoup(res.text, 'html.parser')
+    data_temperature = bsdata.find('p', class_='tem').text
+    data_weather = bsdata.find('p', class_='wea').text
+    return data_temperature, data_weather
+
+# 发送邮件
+def send_email(tem, wea, sender, recevier, password):
+    msg = MIMEText('今天的天气是: ' + tem + wea, 'plain', 'utf-8')
+    msg['subject'] = Header('今日天气预报')
+
+    server = smtplib.SMTP()
+    server.connect('smtp.qq.com', 25)
+    server.login(sender, password)
+    try:
+        server.sendmail(sender, recevier, msg.as_string())
+        return True
+    except:
+        return False
+        server.quit()
+
+# 定时发送
+def job():
+    print("开始第一次发送任务")
+    tem, wea = get_weather()
+    IsSuccess = send_email(tem, wea, sender, recevier, password)
+    while IsSuccess is False:
+        print("邮件发送失败, 正在尝试重新发送")
+        IsSuccess = send_email(tem, wea, sender, recevier, password)
+    print("任务完成")
+
+schedule.every().day.at("14:42").do(job)
+
+while True:
+    schedule.run_pending()
+    time.sleep(1)

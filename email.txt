@@ -1,0 +1,16 @@
+from email.mime.text import MIMEText
+from email.header import Header
+
+def send_email(tem, wea, sender, recevier, password):
+    msg = MIMEText('今天的天气是: ' + tem + wea, 'plain', 'utf-8')
+    msg['subject'] = Header('今日天气预报')
+
+    server = smtplib.SMTP()
+    server.connect('smtp.qq.com', 25)
+    server.login(sender, password)
+    try:
+        server.sendmail(sender, recevier, msg.as_string())
+        return True
+    except:
+        return False
+        server.quit()
